@@ -11,6 +11,7 @@ class QuizViewModel: ViewModel() {
     }
     var isCheater = false
     var currentIndex = 0
+    var cheatTime = 3
     private val questionBank = listOf<Question>(
         Question(R.string.question_australia, true),
         Question(R.string.question_oceans, true),
@@ -28,6 +29,8 @@ class QuizViewModel: ViewModel() {
     fun moveToNext() {
         currentIndex = (currentIndex + 1) % questionBank.size
     }
+
+
 
     override fun onCleared() {
         super.onCleared()

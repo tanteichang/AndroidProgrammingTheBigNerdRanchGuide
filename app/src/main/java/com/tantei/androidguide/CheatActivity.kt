@@ -3,6 +3,7 @@ package com.tantei.androidguide
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
@@ -17,6 +18,7 @@ class CheatActivity : AppCompatActivity() {
 
     private var answerIsTrue = false
     private lateinit var answerTextView: TextView
+    private lateinit var apiLevelView: TextView
     private lateinit var showAnswerButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,6 +29,8 @@ class CheatActivity : AppCompatActivity() {
 
         answerTextView = findViewById(R.id.answer_text_view)
         showAnswerButton = findViewById(R.id.show_answer_button)
+        apiLevelView = findViewById(R.id.show_api_level)
+        answerTextView.setText("API_LEVEL: " + Build.VERSION.SDK_INT.toString())
         showAnswerButton.setOnClickListener {
             val answerText = when  {
                 answerIsTrue -> R.string.true_button

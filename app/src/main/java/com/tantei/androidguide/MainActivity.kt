@@ -15,6 +15,7 @@ import androidx.lifecycle.ViewModelProviders
 
 private const val TAG = "MainActivity"
 private const val KEY_INDEX = "index"
+private const val KEY_CHEAT_TIME = "cheatTime"
 private const val REQUEST_CODE_CHEAT = 0
 
 
@@ -25,6 +26,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var nextButton: Button
     private lateinit var cheatButton: Button
     private lateinit var questionTextView: TextView
+    private lateinit var remainingTimesView: TextView
 
     private val quizViewModel: QuizViewModel by lazy {
         ViewModelProviders.of(this).get(QuizViewModel::class.java)
@@ -36,6 +38,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val currentIndex = savedInstanceState?.getInt(KEY_INDEX, 0) ?: 0
+        quizViewModel.cheatTime  = savedInstanceState?.getInt(KEY_CHEAT_TIME) ?: 3
+
         quizViewModel.currentIndex = currentIndex
 
         val provider: ViewModelProvider  = ViewModelProviders.of(this)
@@ -47,6 +51,8 @@ class MainActivity : AppCompatActivity() {
         nextButton = findViewById(R.id.next_button)
         cheatButton = findViewById(R.id.cheat_button)
         questionTextView = findViewById(R.id.question_text_view)
+        remainingTimesView = findViewById(R.id.remaining_times)
+        remainingTimesView.setText(quizViewModel.cheatTime.toString())
 
         trueButton.setOnClickListener{ view: View ->
             checkAnswer(true)
@@ -63,6 +69,7 @@ class MainActivity : AppCompatActivity() {
             startActivityForResult(intent, REQUEST_CODE_CHEAT)
         }
 
+
         updateQuestion()
 
     }
@@ -71,6 +78,7 @@ class MainActivity : AppCompatActivity() {
         super.onSaveInstanceState(outState)
         Log.i(TAG, "onSaveInstanceState: ")
         outState.putInt(KEY_INDEX, quizViewModel.currentIndex)
+        outState.putInt(KEY_CHEAT_TIME, quizViewModel.cheatTime)
     }
 
     private fun updateQuestion() {
@@ -95,6 +103,11 @@ class MainActivity : AppCompatActivity() {
         }
         if (requestCode == REQUEST_CODE_CHEAT) {
             quizViewModel.isCheater = data?.getBooleanExtra(EXTRA_ANSWER_SHOWN, false) ?: false
+            Log.d(TAG, "onActivityResult: " + quizViewModel.isCheater)
+            Log.d(TAG, "onActivityResult: cheatTime " + quizViewModel.cheatTime)
+            quizViewModel.cheatTime -= 1
+            remainingTimesView.setText(quizViewModel.cheatTime.toString())
+            cheatButton.isEnabled = quizViewModel.cheatTime != 0
         }
     }
 
