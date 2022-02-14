@@ -9,7 +9,7 @@ class QuizViewModel: ViewModel() {
     init {
         Log.d(TAG, "QuizViewModel: created")
     }
-    var isCheater = false
+
     var currentIndex = 0
     private val questionBank = listOf<Question>(
         Question(R.string.question_australia, true),
@@ -24,6 +24,12 @@ class QuizViewModel: ViewModel() {
         get() = questionBank[currentIndex].answer
     val currentQuestionText: Int
         get() = questionBank[currentIndex].textResId
+    val currentIsCheater: Boolean
+        get() = questionBank[currentIndex].isCheater
+
+    fun setCurrentIsCheater(value: Boolean) {
+        questionBank[currentIndex].isCheater = value
+    }
 
     fun moveToNext() {
         currentIndex = (currentIndex + 1) % questionBank.size
