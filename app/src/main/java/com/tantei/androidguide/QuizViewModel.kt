@@ -9,7 +9,7 @@ class QuizViewModel: ViewModel() {
     init {
         Log.d(TAG, "QuizViewModel: created")
     }
-
+    var isCheater = false
     var currentIndex = 0
     private val questionBank = listOf<Question>(
         Question(R.string.question_australia, true),
