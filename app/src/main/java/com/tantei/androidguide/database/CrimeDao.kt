@@ -1,8 +1,7 @@
 package com.tantei.androidguide.database
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Query
+import androidx.room.*
 import com.tantei.androidguide.Crime
 import java.util.*
 
@@ -13,4 +12,9 @@ interface CrimeDao {
 
     @Query("SELECT * FROM crime WHERE id=(:id)")
     fun getCrime(id: UUID): LiveData<Crime?>
+
+    @Update
+    fun updateCrime(crime: Crime)
+    @Insert
+    fun addCrime(crime: Crime)
 }
