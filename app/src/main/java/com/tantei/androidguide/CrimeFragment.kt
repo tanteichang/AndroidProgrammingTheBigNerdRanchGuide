@@ -12,12 +12,13 @@ import java.util.*
 
 private const val TAG = "CrimeFragment"
 private const val ARG_CRIME_ID = "crime_id"
+private const val DIALOG_DATE = "DialogDate"
 
 class CrimeFragment: Fragment() {
 
     private lateinit var titleFiled: EditText
     private lateinit var crime: Crime
-    private lateinit var deleteButton: Button
+    private lateinit var dateButton: Button
     private lateinit var solvedCheckBox: CheckBox
     private val crimeDetailViewModel: CrimeDetailViewModel by lazy {
         ViewModelProviders.of(this).get(CrimeDetailViewModel::class.java)
@@ -38,13 +39,8 @@ class CrimeFragment: Fragment() {
         val view = inflater.inflate(R.layout.fragment_crime, container, false)
 
         titleFiled = view.findViewById(R.id.crime_title)
-        deleteButton = view.findViewById(R.id.crime_date)
+        dateButton = view.findViewById(R.id.crime_date)
         solvedCheckBox = view.findViewById(R.id.crime_solved)
-
-        deleteButton.apply {
-            text = crime.date.toString()
-            isEnabled = false
-        }
 
         return view
     }
@@ -64,11 +60,12 @@ class CrimeFragment: Fragment() {
 
     private fun updateUI() {
         titleFiled.setText(crime.title)
-        deleteButton.text = crime.date.toString()
+        dateButton.text = crime.date.toString()
         solvedCheckBox.apply {
             isChecked = crime.isSolved
             jumpDrawablesToCurrentState()
         }
+
     }
 
     override fun onStart() {
@@ -92,6 +89,12 @@ class CrimeFragment: Fragment() {
         solvedCheckBox.apply {
             setOnCheckedChangeListener {_, isChecked ->
                 crime.isSolved = isChecked
+            }
+        }
+
+        dateButton.setOnClickListener {
+            DatePickerFragment().apply {
+                show(this@CrimeFragment.requireFragmentManager(), DIALOG_DATE)
             }
         }
     }
