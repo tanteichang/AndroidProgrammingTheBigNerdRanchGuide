@@ -1,5 +1,6 @@
 package com.tantei.androidguide
 
+import android.icu.text.RelativeDateTimeFormatter
 import android.os.Bundle
 import android.text.*
 import android.util.Log
@@ -13,8 +14,9 @@ import java.util.*
 private const val TAG = "CrimeFragment"
 private const val ARG_CRIME_ID = "crime_id"
 private const val DIALOG_DATE = "DialogDate"
+private const val REQUEST_DATE = 0
 
-class CrimeFragment: Fragment() {
+class CrimeFragment: Fragment(), DatePickerFragment.Callbacks {
 
     private lateinit var titleFiled: EditText
     private lateinit var crime: Crime
@@ -94,6 +96,7 @@ class CrimeFragment: Fragment() {
 
         dateButton.setOnClickListener {
             DatePickerFragment().apply {
+                setTargetFragment(this@CrimeFragment, REQUEST_DATE)
                 show(this@CrimeFragment.requireFragmentManager(), DIALOG_DATE)
             }
         }
@@ -104,6 +107,10 @@ class CrimeFragment: Fragment() {
         crimeDetailViewModel.saveCrime(crime)
     }
 
+    override fun onDateSelected(date: Date) {
+        crime.date = date
+        updateUI()
+    }
 
     companion object {
         fun newInstance(crimeId: UUID): CrimeFragment {
