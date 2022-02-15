@@ -1,11 +1,14 @@
 package com.tantei.androidguide
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.room.Room
 import com.tantei.androidguide.database.CrimeDao
 import com.tantei.androidguide.database.CrimeDatabase
 import java.util.*
+
+private const val TAG = "CrimeRepository"
 
 private const val DATABASE_NAME = "crime-database"
 
@@ -25,7 +28,9 @@ class CrimeRepository private constructor(context: Context){
         private var INSTANCE: CrimeRepository? = null
 
         fun initialize(context: Context) {
+
             if (INSTANCE == null) {
+                Log.d(TAG, "initialize: called")
                 INSTANCE = CrimeRepository(context)
             }
         }
