@@ -7,10 +7,11 @@
         <entry key="app/src/main/res/layout-land/activity_main.xml" value="0.33" />
         <entry key="app/src/main/res/layout/activity_cheat.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.33" />
-        <entry key="app/src/main/res/layout/fragment_crime.xml" value="0.14159067882472137" />
+        <entry key="app/src/main/res/layout/fragment_crime.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_crime_list.xml" value="0.14184397163120568" />
         <entry key="app/src/main/res/layout/list_item_crime.xml" value="0.7287334593572778" />
         <entry key="app/src/main/res/menu/fragment_crime_list.xml" value="0.1" />
+        <entry key="app/src/main/res/xml/files.xml" value="0.28306159420289856" />
       </map>
     </option>
   </component>
