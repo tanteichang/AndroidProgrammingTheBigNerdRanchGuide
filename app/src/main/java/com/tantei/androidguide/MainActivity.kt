@@ -4,26 +4,68 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Toast
+import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.tantei.androidguide.databinding.ActivityMainBinding
+import com.tantei.androidguide.databinding.ListItemSoundBinding
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var trueButton: Button
-    private lateinit var falseButton: Button
+    private lateinit var beatBox: BeatBox
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
 
-        trueButton = findViewById(R.id.ture_button)
-        falseButton = findViewById(R.id.false_button)
+        beatBox = BeatBox(assets)
 
-        trueButton.setOnClickListener{ view: View ->
-            Toast.makeText(this, R.string.correct_toast, Toast.LENGTH_SHORT).show();
+        val binding: ActivityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+
+        binding.recyclerView.apply {
+            layoutManager = GridLayoutManager(context, 3)
+            adapter = SoundAdapter(beatBox.sounds)
         }
-        falseButton.setOnClickListener{ view: View ->
-            Toast.makeText(this, R.string.incorrect_toast, Toast.LENGTH_SHORT).show();
+    }
+
+    private inner class SoundHolder(private val binding: ListItemSoundBinding) : RecyclerView.ViewHolder(binding.root) {
+        init {
+            binding.viewModel = SoundViewModel(beatBox)
         }
+
+        fun bind(sound: Sound) {
+            binding.apply {
+                viewModel?.sound = sound
+                executePendingBindings()
+            }
+        }
+    }
+
+    private inner class SoundAdapter(private val sounds: List<Sound>) : RecyclerView.Adapter<SoundHolder>() {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SoundHolder {
+            val binding = DataBindingUtil.inflate<ListItemSoundBinding>(
+                layoutInflater,
+                R.layout.list_item_sound,
+                parent,
+                false
+            )
+            return SoundHolder(binding)
+        }
+
+        override fun onBindViewHolder(holder: SoundHolder, position: Int) {
+            val sound = sounds[position]
+            holder.bind(sound)
+        }
+
+        override fun getItemCount(): Int {
+            return sounds.size
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        beatBox.release()
     }
 }
