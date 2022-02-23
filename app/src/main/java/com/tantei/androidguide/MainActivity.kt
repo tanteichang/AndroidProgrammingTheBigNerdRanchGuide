@@ -1,71 +1,89 @@
 package com.tantei.androidguide
 
+import android.content.Intent
+import android.content.pm.ResolveInfo
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.Gravity
+import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.Toast
-import androidx.databinding.DataBindingUtil
-import androidx.recyclerview.widget.GridLayoutManager
+import android.widget.TextView
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.tantei.androidguide.databinding.ActivityMainBinding
-import com.tantei.androidguide.databinding.ListItemSoundBinding
+
+private const val TAG = "MainActivity"
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var beatBox: BeatBox
+    private lateinit var recyclerView: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        Log.d(TAG, "onCreate: ")
 
-        beatBox = BeatBox(assets)
+        recyclerView = findViewById(R.id.recycler_view)
+        recyclerView.layoutManager = LinearLayoutManager(this)
 
-        val binding: ActivityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-
-        binding.recyclerView.apply {
-            layoutManager = GridLayoutManager(context, 3)
-            adapter = SoundAdapter(beatBox.sounds)
-        }
+        setupAdapter()
     }
 
-    private inner class SoundHolder(private val binding: ListItemSoundBinding) : RecyclerView.ViewHolder(binding.root) {
-        init {
-            binding.viewModel = SoundViewModel(beatBox)
+    private fun setupAdapter() {
+        val startupIntent= Intent(Intent.ACTION_MAIN).apply {
+            addCategory(Intent.CATEGORY_LAUNCHER)
         }
-
-        fun bind(sound: Sound) {
-            binding.apply {
-                viewModel?.sound = sound
-                executePendingBindings()
-            }
-        }
-    }
-
-    private inner class SoundAdapter(private val sounds: List<Sound>) : RecyclerView.Adapter<SoundHolder>() {
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SoundHolder {
-            val binding = DataBindingUtil.inflate<ListItemSoundBinding>(
-                layoutInflater,
-                R.layout.list_item_sound,
-                parent,
-                false
+        val activities = packageManager.queryIntentActivities(startupIntent, 0)
+        activities.sortWith( Comparator { a, b ->
+            String.CASE_INSENSITIVE_ORDER.compare(
+                a.loadLabel(packageManager).toString(),
+                b.loadLabel(packageManager).toString(),
             )
-            return SoundHolder(binding)
+        })
+        recyclerView.adapter = ActivityAdapter(activities)
+    }
+
+    private class ActivityHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
+        private val nameTextView = itemView as TextView
+        private lateinit var resolveInfo: ResolveInfo
+
+        init {
+            nameTextView.setOnClickListener(this)
         }
 
-        override fun onBindViewHolder(holder: SoundHolder, position: Int) {
-            val sound = sounds[position]
-            holder.bind(sound)
+        fun bindActivity(resolveInfo: ResolveInfo) {
+            this.resolveInfo = resolveInfo
+            val packageManager = itemView.context.packageManager
+            val appName = resolveInfo.loadLabel(packageManager).toString()
+            nameTextView.text = appName
+        }
+
+        override fun onClick(view: View) {
+            val activityInfo= resolveInfo.activityInfo
+            val intent = Intent(Intent.ACTION_MAIN).apply {
+                setClassName(activityInfo.applicationInfo.packageName, activityInfo.name)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+
+            val context=  view.context
+            context.startActivity(intent)
+        }
+    }
+
+    private class ActivityAdapter(val activities: List<ResolveInfo>) : RecyclerView.Adapter<ActivityHolder>() {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ActivityHolder {
+            val layoutInflater = LayoutInflater.from(parent.context)
+            val view = layoutInflater.inflate(android.R.layout.simple_list_item_1, parent, false)
+            return ActivityHolder(view)
+        }
+
+        override fun onBindViewHolder(holder: ActivityHolder, position: Int) {
+            val resolveInfo = activities[position]
+            holder.bindActivity(resolveInfo)
         }
 
         override fun getItemCount(): Int {
-            return sounds.size
+            return activities.size
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        beatBox.release()
     }
 }
